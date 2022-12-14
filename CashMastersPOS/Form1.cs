@@ -22,8 +22,13 @@ namespace CashMastersPOS
         {
             InitializeComponent();
         }
+        //global variables
         double totalAmount = 0.0;
         string curencyType = "";
+
+        /// <summary>
+        /// Initializes the view for our visual interface, adding buttons depending on the type of currency in appconfig
+        /// </summary>
         private void Form1_Load(object sender, EventArgs e)
         {
             curencyType = ConfigurationManager.AppSettings["CurrencyType"];
@@ -41,7 +46,7 @@ namespace CashMastersPOS
                         b.Size = new Size(40, 60);
                         b.Location = newLoc;
                         b.Text = elem.Value.ToString();
-                        b.Click += new EventHandler(button_Click);
+                        b.Click += new EventHandler(DinamicButton_Click);
 
                         newLoc.Offset(b.Width + 7, 0);
                         Controls.Add(b);
@@ -58,7 +63,7 @@ namespace CashMastersPOS
                         b.Size = new Size(40, 60);
                         b.Location = newLock;
                         b.Text = elem.Value.ToString();
-                        b.Click += new EventHandler(button_Click);
+                        b.Click += new EventHandler(DinamicButton_Click);
 
                         newLock.Offset(b.Width + 7, 0);
                         Controls.Add(b);
@@ -69,25 +74,16 @@ namespace CashMastersPOS
 
         }
 
-        private void button_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Gives funcionality to the buttons created, too resemble what bills and coins was payed with
+        /// </summary>
+        private void DinamicButton_Click(object sender, EventArgs e)
         {
             string buttonName = ((System.Windows.Forms.Button)sender).Text;
             if (!this.txtItemsPurchased.Text.Equals(""))
             {
                 totalAmount += Convert.ToDouble(buttonName);
                 txtTotalAmount.Text = totalAmount.ToString();
-                //var temp = totalAmount;
-                //temp += Convert.ToDouble(buttonName);
-                //if (Convert.ToDouble(this.txtItemsPurchased.Text) >= temp)
-                //{
-                //    totalAmount += Convert.ToDouble(buttonName);
-                //    txtTotalAmount.Text = totalAmount.ToString();
-                //}
-                //else
-                //{
-                //    MessageBox.Show("Cannot have less bills and coins than value", "Warning");
-                //    this.txtItemsPurchased.Focus();
-                //}
 
             }
             else {
@@ -98,7 +94,10 @@ namespace CashMastersPOS
 
         }
 
-  
+
+        /// <summary>
+        /// only lets numbers and 1 decimal per inputField
+        /// </summary>
         private void txtItemsPurchased_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) &&
@@ -114,6 +113,10 @@ namespace CashMastersPOS
             }
         }
 
+        /// <summary>
+        /// Excecutes the logic behind getting the change, depending on the currency type it will do the operation then
+        /// set the change values into a string that the user can interpret in a label.
+        /// </summary>
         private void btnPay_Click(object sender, EventArgs e)
         {
             if (totalAmount < Convert.ToDouble(this.txtItemsPurchased.Text) )
@@ -151,7 +154,7 @@ namespace CashMastersPOS
                         ProcessChange MexOperation = new ProcessChange();
                         MexOperation.calculateMex(Convert.ToDouble(this.txtItemsPurchased.Text), Convert.ToDouble(txtTotalAmount.Text));
                         var listMex = MexOperation.USChange;
-                        var messageMex = MexOperation.returnChangeBillsCoins();
+                        var messageMex = MexOperation.returnChangeBillsCoinsMex();
 
                         this.lblValuetoRetrun.Text = messageMex;
 
@@ -165,6 +168,9 @@ namespace CashMastersPOS
             }
         }
 
+        /// <summary>
+        /// Clears the screens form.
+        /// </summary>
         private void btnClear_Click(object sender, EventArgs e)
         {
             this.txtItemsPurchased.Text = string.Empty;
